@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	<body>
+		<table>
+			<tr th:each="product: ${productList}">
+				<td th:text="${product.getId()}"></td>
+				<td th:text="${product.getTitle()}"></td>
+				<td th:text="${product.getDescription()}"></td>
+				<td th:text="${product.getQuantity()}"></td>
+				<td th:text="${product.getPrice()}"></td>
+			</tr>
+		</table>
+	</body>
+</html>
