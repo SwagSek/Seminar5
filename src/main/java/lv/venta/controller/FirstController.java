@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import lv.venta.model.Product;
@@ -13,6 +14,12 @@ import lv.venta.service.ICRUDProductService;
 import lv.venta.service.IFilterProductService;
 
 import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @Controller
@@ -71,4 +78,32 @@ public class FirstController {
 			return "error-page";
 		}
 	}	
+	
+	@GetMapping("product/insert")
+	public String getProductInsert(Model model) {
+		model.addAttribute("product", new Product());
+		return "product-insert-page";
+	}
+	
+	@PostMapping("product/insert")
+	public String postProductInsert(@Valid Product product, BindingResult result) {
+		
+		if(result.hasErrors()) {
+			return "product-insert-page";
+		}
+		else {
+			try {
+				crudService.createProduct(product.getTitle(), product.getDescription(), product.getPrice(), product.getQuantity());
+				return "redirect:/product/getList";
+			} 
+			catch (Exception e) {
+				return "redirect:/error";
+			}
+		}
+	}
+	
+	@GetMapping("/error")
+	public String getError() {
+		return "error-page";
+	}
 }
