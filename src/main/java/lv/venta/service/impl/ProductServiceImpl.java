@@ -55,8 +55,10 @@ public class ProductServiceImpl implements ICRUDProductService, IFilterProductSe
 	@Override
 	public void updateById(int id, String title, String description, float price, int quantity) throws Exception {
 		Product currentProduct = retrieveById(id);
-		Product newProduct = createProduct(title, description, price, quantity);
-		currentProduct = newProduct;
+		if (title != null) currentProduct.setTitle(title);
+		if (description != null) currentProduct.setDescription(description);
+		if (price >= 0 && price <= 10000) currentProduct.setPrice(price);
+		if (quantity >= 0 && quantity <= 100) currentProduct.setQuantity(quantity);
 	}
 
 	@Override
@@ -66,26 +68,52 @@ public class ProductServiceImpl implements ICRUDProductService, IFilterProductSe
 	
 	@Override
 	public ArrayList<Product> filterByPriceLessThanThreshold(float threshold) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (threshold < 0 || threshold > 10000) throw new Exception("Bad price threshold.");
+		
+		ArrayList<Product> products = new ArrayList<Product>();
+		for (Product p : productList) {
+			if(p.getPrice() < threshold) {
+				products.add(p);
+			}
+		}
+		return products;
 	}
 
 	@Override
 	public ArrayList<Product> filterByQuantityLessThanThreshold(int threshold) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (threshold < 0 || threshold >= 100) throw new Exception("Bad quantity threshold.");
+		
+		ArrayList<Product> products = new ArrayList<Product>();
+		for (Product p : productList) {
+			if(p.getQuantity() < threshold) {
+				products.add(p);
+			}
+		}
+		return products;
 	}
 
 	@Override
 	public ArrayList<Product> filterByTitleOrDescription(String text) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if (text == null) throw new Exception("Bad input value.");
+		
+		ArrayList<Product> products = new ArrayList<Product>();
+		for (Product p : productList) {
+			if(p.getTitle().contains(text) || p.getDescription().contains(text)) {
+				products.add(p);
+			}
+		}
+		return products;
 	}
 
 	@Override
 	public float calculateProductsTotalValue() throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		if (productList.isEmpty()) throw new Exception("Product list is empty.");
+		
+		float sum = 0;
+		for (Product p : productList) {
+			sum += p.getPrice()*p.getQuantity();
+		}
+		return sum;
 	}
 	
 }
