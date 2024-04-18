@@ -1,5 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 	<body>
+		<p th:text="${msg}"></p>
 		<table>
 			<tr th:each="product: ${productList}">
 				<td th:text="${product.getId()}"></td>
