@@ -198,10 +198,8 @@ public class FirstController {
 	@GetMapping("product/filter/totalValue")
 	public String getProductTotalValue(Model model) {
 		try {
-			ArrayList<Product> allProducts = crudService.retrieveAll();
-			model.addAttribute("productList", allProducts);
-			model.addAttribute("msg", "Total sum of all products: " + filterService.calculateProductsTotalValue());
-			return "productList-page";
+			model.addAttribute("mydata", "Total sum of all products: " + filterService.calculateProductsTotalValue() + " eur");
+			return "hello-msg-page";
 		} 
 		catch (Exception e) {
 			model.addAttribute("errormsg", e.getMessage());
