@@ -3,15 +3,20 @@ package lv.venta.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lv.venta.model.Product;
+import lv.venta.repo.IProductRepo;
 import lv.venta.service.ICRUDProductService;
 import lv.venta.service.IFilterProductService;
 
 @Service
 public class ProductServiceImpl implements ICRUDProductService, IFilterProductService{
 
+	//@Autowired
+	//private IProductRepo productRepo;
+	
 	private Product p1 = new Product("Eggs", "Chicken eggs", 3.00f, 16);
 	private Product p2 = new Product("Apples", "Sour Green Apples", 1.50f, 8);
 	private Product p3 = new Product("Cola", "Coca-cola", 1.30f, 20);
