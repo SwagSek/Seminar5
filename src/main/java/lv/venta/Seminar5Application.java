@@ -26,6 +26,7 @@ public class Seminar5Application {
 				productRepo.save(p1);
 				productRepo.save(p2);
 				productRepo.save(p3);
+				
 			}
 		};
 	}

@@ -14,45 +14,37 @@ import lv.venta.service.IFilterProductService;
 @Service
 public class ProductServiceImpl implements ICRUDProductService, IFilterProductService{
 
-	//@Autowired
-	//private IProductRepo productRepo;
-	
-	private Product p1 = new Product("Eggs", "Chicken eggs", 3.00f, 16);
-	private Product p2 = new Product("Apples", "Sour Green Apples", 1.50f, 8);
-	private Product p3 = new Product("Cola", "Coca-cola", 1.30f, 20);
-	private ArrayList<Product> productList = new ArrayList<Product>(Arrays.asList(p1, p2, p3));
+	@Autowired
+	private IProductRepo productRepo;
 	
 	@Override
 	public Product createProduct(String title, String description, float price, int quantity) throws Exception {
-		if(title == null || description == null || price < 0 || quantity < 0)
-			throw new Exception("Bad input values.");
+		if(title == null || description == null || price < 0 || quantity < 0) throw new Exception("Bad input values.");
 		
-		for (Product p : productList) {
-			if (p.getTitle().equals(title) && p.getDescription().equals(description) && p.getPrice() == price) {
-				p.setQuantity(p.getQuantity() + quantity);
-				return p;
-			}
+		Product foundProduct = productRepo.findByTitleAndDescriptionAndPrice(title, description, price);
+		if(foundProduct != null) {
+			foundProduct.setQuantity(foundProduct.getQuantity() + quantity);
+			return productRepo.save(foundProduct);
 		}
+		
 		Product newProduct = new Product(title, description, price, quantity);
-		productList.add(newProduct);
+		productRepo.save(newProduct);
 		return newProduct;
 	}
 
 	@Override
 	public ArrayList<Product> retrieveAll() throws Exception {
-		if (productList.isEmpty()) throw new Exception("Product list is empty.");
-		return productList;
+		if (productRepo.count() == 0) throw new Exception("Product list is empty.");
+		return (ArrayList<Product>) productRepo.findAll();
 	}
 
 	@Override
 	public Product retrieveById(int id) throws Exception {
-		if (productList.isEmpty()) throw new Exception("Product list is empty.");
+		if (productRepo.count() == 0) throw new Exception("Product list is empty.");
 		if (id <= 0) throw new Exception("ID must be positive.");
 		
-		for (Product p : productList) {
-			if(p.getId() == id) {
-				return p;
-			}
+		if(productRepo.existsById(id)) {
+			return productRepo.findById(id).get();
 		}
 		throw new Exception("Product with given ID not found");
 	}
@@ -64,61 +56,36 @@ public class ProductServiceImpl implements ICRUDProductService, IFilterProductSe
 		if (description != null) currentProduct.setDescription(description);
 		if (price >= 0 && price <= 10000) currentProduct.setPrice(price);
 		if (quantity >= 0 && quantity <= 100) currentProduct.setQuantity(quantity);
+		productRepo.save(currentProduct);
 	}
 
 	@Override
 	public void deleteById(int id) throws Exception {
-		productList.remove(retrieveById(id));
+		productRepo.deleteById(id);
 	}
 	
 	@Override
 	public ArrayList<Product> filterByPriceLessThanThreshold(float threshold) throws Exception {
 		if (threshold < 0 || threshold > 10000) throw new Exception("Bad price threshold.");
-		
-		ArrayList<Product> products = new ArrayList<Product>();
-		for (Product p : productList) {
-			if(p.getPrice() < threshold) {
-				products.add(p);
-			}
-		}
-		return products;
+		return productRepo.findByPriceLessThan(threshold);
 	}
 
 	@Override
 	public ArrayList<Product> filterByQuantityLessThanThreshold(int threshold) throws Exception {
 		if (threshold < 0 || threshold >= 100) throw new Exception("Bad quantity threshold.");
-		
-		ArrayList<Product> products = new ArrayList<Product>();
-		for (Product p : productList) {
-			if(p.getQuantity() < threshold) {
-				products.add(p);
-			}
-		}
-		return products;
+		return productRepo.findByQuantityLessThan(threshold);
 	}
 
 	@Override
 	public ArrayList<Product> filterByTitleOrDescription(String text) throws Exception {
 		if (text == null) throw new Exception("Bad input value.");
-		
-		ArrayList<Product> products = new ArrayList<Product>();
-		for (Product p : productList) {
-			if(p.getTitle().toLowerCase().contains(text.toLowerCase()) || p.getDescription().toLowerCase().contains(text.toLowerCase())) {
-				products.add(p);
-			}
-		}
-		return products;
+		return productRepo.findByTitleContainingOrDescriptionContaining(text);
 	}
 
 	@Override
 	public float calculateProductsTotalValue() throws Exception {
-		if (productList.isEmpty()) throw new Exception("Product list is empty.");
-		
-		float sum = 0;
-		for (Product p : productList) {
-			sum += p.getPrice()*p.getQuantity();
-		}
-		return sum;
+		if (productRepo.count() == 0) throw new Exception("Product list is empty.");
+		return productRepo.calculateTotalValueFromDB();
 	}
 	
 }
