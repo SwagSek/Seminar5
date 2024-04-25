@@ -79,7 +79,7 @@ public class ProductServiceImpl implements ICRUDProductService, IFilterProductSe
 	@Override
 	public ArrayList<Product> filterByTitleOrDescription(String text) throws Exception {
 		if (text == null) throw new Exception("Bad input value.");
-		return productRepo.findByTitleContainingOrDescriptionContaining(text);
+		return productRepo.findByTitleContainingOrDescriptionContaining(text, text);
 	}
 
 	@Override
